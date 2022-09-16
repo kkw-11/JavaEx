@@ -1,4 +1,4 @@
-package Method;
+package method;
 
 public class StaticMyMath {
     static final double ZERO = 0;

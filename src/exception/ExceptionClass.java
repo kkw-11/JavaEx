@@ -4,7 +4,7 @@ public class ExceptionClass {
     public static void main(String[] args){
 
         try{
-            ExceptionClass.sumTwoNumbers("ㄱ", "2");
+            sumTwoNumbers("ㄱ", "2");
         }catch(NumberFormatException e){
             System.out.println("입력하신 값은 숫자가 아닙니다.");
         }

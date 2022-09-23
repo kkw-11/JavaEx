@@ -4,7 +4,7 @@ public class Car {
     int price;
     int bonusPoint;
 
-    Car(){
+    public Car(){
     }
     Car(int price){
         this.price = price;

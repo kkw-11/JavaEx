@@ -2,14 +2,14 @@ package polymorphism;
 
 public class Car {
 
-    String color;
-    int door;
+    public String color;
+    public int door;
 
-    void drive() {
+    public void drive() {
         System.out.println("drive!!");
     }
 
-    void stop(){
+    public void stop(){
         System.out.println("stop!!!");
     }
 }

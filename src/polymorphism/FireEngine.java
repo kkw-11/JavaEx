@@ -1,7 +1,7 @@
 package polymorphism;
 
 public class FireEngine extends Car {
-    public void water(){
+    void water(){
         System.out.println("water!!!");
     }
 }

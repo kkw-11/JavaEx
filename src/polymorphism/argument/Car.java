@@ -7,6 +7,7 @@ public class Car {
     }
     protected Car(int price){
         this.price = price;
+    int bonusPoint;
     }
 
     void drive() {

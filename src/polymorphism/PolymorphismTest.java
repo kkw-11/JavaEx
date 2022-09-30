@@ -2,8 +2,8 @@ package polymorphism;
 
 public class PolymorphismTest {
     public static void main(String[] args) {
-
         Car car = new FireEngine();
+
 
         car.stop();
         car.drive();

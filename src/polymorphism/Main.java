@@ -5,7 +5,6 @@ public class Main {
         Car car;
         car = new Car();
 
-
         SmartTv smartTv = new SmartTv();
         Tv tv = new SmartTv(); //부모 타입의 참조변수로 자식 인스턴스를 참조, 참조변수 타입과 인스턴스 타입과 일치하지 않지만 참조 가능
 

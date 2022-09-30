@@ -7,6 +7,7 @@ public class Buyer {
 
     void buy(Car car){
         if(money < car.price){
+
             System.out.println("잔액이 부족하여 물건을 살 수 없습니다.");
             return;
         }

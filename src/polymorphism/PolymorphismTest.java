@@ -3,6 +3,11 @@ package polymorphism;
 public class PolymorphismTest {
     public static void main(String[] args) {
 
+        Car car = new FireEngine();
+
+        car.stop();
+        car.drive();
+//        car.water();
 
         SmartTv smartTv = new SmartTv();
         Tv tv = new SmartTv(); //조상 타입의 참조변수로 자손 인스턴스를 참조, 참조변수 타입과 인스턴스 타입과 일치하지 않지만 참조 가능

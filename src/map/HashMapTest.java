@@ -14,8 +14,7 @@ public class HashMapTest {
         hm.put(new Car(100), "I'm Car Class");
 
         hm.put(new Car(100), "I'm Car Class");
-
-        System.out.println(hm.get(car));
+        hm.put(new FireEngine(), "I'm Car Class");
 
         System.out.println("size :: " + hm.size());
 

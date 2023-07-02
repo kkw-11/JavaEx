@@ -5,6 +5,7 @@ public class Main {
         Parent parent = new Parent();
         Child child = new Child();
         child.age = 10;
+        System.out.println(child.age);
 //        parent.play();
         parent.myWork("안진명");
         child.myWork("안윤빈");

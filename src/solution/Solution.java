@@ -1,131 +1,101 @@
 package solution;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 class Solution {
-    private static Object Arrays;
-    int answer = 2147483647;
-    int[] row = {0, 0, -1, 1};
-    int[] col = {-1, 1, 0, 0};
 
-    public int solution(int[] nums) {
-        int answer = 0;
+    public int[] solution(int[] progresses, int[] speeds) {
+        int[] answer = new int[progresses.length];
+        int cnt = 0;
 
-        int halfNumsLen = nums.length/2;
+        List<Integer> answerList = new ArrayList<>();
+        List<Integer> deploymentDay = new ArrayList<>();
 
-        Set<Integer> ponKetMonSet = new HashSet<>();
-        for (Integer num : nums) {
-            ponKetMonSet.add(num);
+        for (int i = 0; i < progresses.length; ++i) {
+            deploymentDay.add((int) (Math.ceil((double) (100 - progresses[i]) / speeds[i])));
         }
+        Stack<Integer> deploymentLeadDayStack = new Stack<>();
+        Integer rightMaxNum = 0;
 
-        System.out.println(ponKetMonSet);
-
-        if (ponKetMonSet.size() > halfNumsLen) {
-            answer = halfNumsLen;
-        } else {
-            answer = ponKetMonSet.size();
-        }
-
-        return answer;
-    }
-
-
-    private void recur(int curR, int curC, int cnt, int n, int m, boolean[][] visited, int[][] maps) {
-        if (curR == n - 1 && curC == m - 1) {
-            if (answer > cnt) {
-                answer = cnt;
-            }
-        } else {
-            for (int i = 0; i < 4; ++i) {
-                int nextR = curR + row[i];
-                int nextC = curC + col[i];
-
-                if ((nextR >= 0 && nextR < n) && (nextC >= 0 && nextC < m)) {
-                    if (maps[nextR][nextC] == 1) {
-                        if (visited[nextR][nextC] != true) {
-                            visited[nextR][nextC] = true;
-                            recur(nextR, nextC, cnt + 1, n, m, visited, maps);
-                            visited[nextR][nextC] = false;
-                        }
-
-                    }
+        for (int i = 0; i < progresses.length; ++i) {
+            if (deploymentLeadDayStack.isEmpty()) {
+                deploymentLeadDayStack.push(deploymentDay.get(i));
+                rightMaxNum = deploymentDay.get(i);
+            } else {
+                if (deploymentDay.get(i) <= rightMaxNum) {
+                    deploymentLeadDayStack.push(deploymentDay.get(i));
+                } else {
+                    answer[cnt++] = deploymentLeadDayStack.size();
+                    answerList.add(deploymentLeadDayStack.size());
+                    deploymentLeadDayStack.removeAllElements();
+                    rightMaxNum = deploymentDay.get(i);
+                    deploymentLeadDayStack.push(deploymentDay.get(i));
 
                 }
-
             }
 
         }
+        if(!deploymentLeadDayStack.isEmpty()){
+            answerList.add(deploymentLeadDayStack.size());
+            answer[cnt++] = deploymentLeadDayStack.size();
+        }
 
+//        answer = answerList.stream().mapToInt(Integer::intValue).toArray();
+        int[] result = new int[cnt];
+        System.arraycopy(answer, 0, result, 0, cnt)
+
+
+        return result;
     }
 
 
     public static void main(String[] args) {
         /**
-         * [[1,0,1,1,1],
-         * [1,0,1,0,1],
-         * [1,0,1,1,1],
-         * [1,1,1,0,1],
-         * [0,0,0,0,1]]
+         * 기능개발
+         * 문제 설명
+         * 프로그래머스 팀에서는 기능 개선 작업을 수행 중입니다. 각 기능은 진도가 100%일 때 서비스에 반영할 수 있습니다.
          *
+         * 또, 각 기능의 개발속도는 모두 다르기 때문에 뒤에 있는 기능이 앞에 있는 기능보다 먼저 개발될 수 있고, 이때 뒤에 있는 기능은 앞에 있는 기능이 배포될 때 함께 배포됩니다.
          *
-         * •	당신은 폰켓몬을 잡기 위한 오랜 여행 끝에, 홍 박사님의 연구실에 도착했습니다. 홍 박사님은 당신에게 자신의 연구실에
-         * 있는 총 N 마리의 폰켓몬 중에서 N/2마리를 가져가도 좋다고 했습니다.
-         * 홍 박사님 연구실의 폰켓몬은 종류에 따라 번호를 붙여 구분합니다. 따라서 같은 종류의 폰켓몬은 같은 번호를 가지고 있습니다.
-         * 예를 들어 연구실에 총 4마리의 폰켓몬이 있고, 각 폰켓몬의 종류 번호가 [3번, 1번, 2번, 3번]이라면 이는 3번 폰켓몬 두 마리,
-         * 1번 폰켓몬 한 마리, 2번 폰켓몬 한 마리가 있음을 나타냅니다. 이때, 4마리의 폰켓몬 중 2마리를 고르는 방법은 다음과 같이 6가지가 있습니다.
-         * 1.	첫 번째(3번), 두 번째(1번) 폰켓몬을 선택
-         * 2.	첫 번째(3번), 세 번째(2번) 폰켓몬을 선택
-         * 3.	첫 번째(3번), 네 번째(3번) 폰켓몬을 선택
-         * 4.	두 번째(1번), 세 번째(2번) 폰켓몬을 선택
-         * 5.	두 번째(1번), 네 번째(3번) 폰켓몬을 선택
-         * 6.	세 번째(2번), 네 번째(3번) 폰켓몬을 선택
+         * 먼저 배포되어야 하는 순서대로 작업의 진도가 적힌 정수 배열 progresses와 각 작업의 개발 속도가 적힌 정수 배열 speeds가 주어질 때 각 배포마다 몇 개의 기능이 배포되는지를
+         * return 하도록 solution 함수를 완성하세요.
          *
-         *
-         * 이때, 첫 번째(3번) 폰켓몬과 네 번째(3번) 폰켓몬을 선택하는 방법은 한 종류(3번 폰켓몬 두 마리)의 폰켓몬만 가질 수 있지만,
-         * 다른 방법들은 모두 두 종류의 폰켓몬을 가질 수 있습니다. 따라서 위 예시에서 가질 수 있는 폰켓몬 종류 수의 최댓값은 2가 됩니다.
-         * 당신은 최대한 다양한 종류의 폰켓몬을 가지길 원하기 때문에, 최대한 많은 종류의 폰켓몬을 포함해서 N/2마리를 선택하려 합니다.
-         * N마리 폰켓몬의 종류 번호가 담긴 배열 nums가 매개변수로 주어질 때, N/2마리의 폰켓몬을 선택하는 방법 중, 가장 많은 종류의 폰켓몬을
-         * 선택하는 방법을 찾아, 그때의 폰켓몬 종류 번호의 개수를 return 하도록 solution 함수를 완성해주세요.
-         * 제한사항
-         * •	nums는 폰켓몬의 종류 번호가 담긴 1차원 배열입니다.
-         * •	nums의 길이(N)는 1 이상 10,000 이하의 자연수이며, 항상 짝수로 주어집니다.
-         * •	폰켓몬의 종류 번호는 1 이상 200,000 이하의 자연수로 나타냅니다.
-         * •	가장 많은 종류의 폰켓몬을 선택하는 방법이 여러 가지인 경우에도, 선택할 수 있는 폰켓몬 종류 개수의 최댓값 하나만 return 하면 됩니다.
-         * ________________________________________
+         * 제한 사항
+         * 작업의 개수(progresses, speeds배열의 길이)는 100개 이하입니다.
+         * 작업 진도는 100 미만의 자연수입니다.
+         * 작업 속도는 100 이하의 자연수입니다.
+         * 배포는 하루에 한 번만 할 수 있으며, 하루의 끝에 이루어진다고 가정합니다. 예를 들어 진도율이 95%인 작업의 개발 속도가 하루에 4%라면 배포는 2일 뒤에 이루어집니다.
          * 입출력 예
-         * nums	result
-         * [3,1,2,3]	2
-         * [3,3,3,2,2,4]	3
-         * [3,3,3,2,2,2]	2
+         * progresses	speeds	return
+         * [93, 30, 55]	[1, 30, 5]	[2, 1]
+         * [95, 90, 99, 99, 80, 99]	[1, 1, 1, 1, 1, 1]	[1, 3, 2]
          * 입출력 예 설명
          * 입출력 예 #1
-         * 문제의 예시와 같습니다.
+         * 첫 번째 기능은 93% 완료되어 있고 하루에 1%씩 작업이 가능하므로 7일간 작업 후 배포가 가능합니다.
+         * 두 번째 기능은 30%가 완료되어 있고 하루에 30%씩 작업이 가능하므로 3일간 작업 후 배포가 가능합니다. 하지만 이전 첫 번째 기능이 아직 완성된 상태가 아니기 때문에
+         * 첫 번째 기능이 배포되는 7일째 배포됩니다.
+         * 세 번째 기능은 55%가 완료되어 있고 하루에 5%씩 작업이 가능하므로 9일간 작업 후 배포가 가능합니다.
+         *
+         * 따라서 7일째에 2개의 기능, 9일째에 1개의 기능이 배포됩니다.
+         *
          * 입출력 예 #2
-         * 6마리의 폰켓몬이 있으므로, 3마리의 폰켓몬을 골라야 합니다.
-         * 가장 많은 종류의 폰켓몬을 고르기 위해서는 3번 폰켓몬 한 마리, 2번 폰켓몬 한 마리, 4번 폰켓몬 한 마리를 고르면 되며, 따라서 3을 return 합니다.
-         * 입출력 예 #3
-         * 6마리의 폰켓몬이 있으므로, 3마리의 폰켓몬을 골라야 합니다.
-         * 가장 많은 종류의 폰켓몬을 고르기 위해서는 3번 폰켓몬 한 마리와 2번 폰켓몬 두 마리를 고르거나, 혹은 3번 폰켓몬 두 마리와 2번 폰켓몬 한 마리를 고르면 됩니다. 따라서 최대 고를 수 있는 폰켓몬 종류의 수는 2입니다.
+         * 모든 기능이 하루에 1%씩 작업이 가능하므로, 작업이 끝나기까지 남은 일수는 각각 5일, 10일, 1일, 1일, 20일, 1일입니다. 어떤 기능이 먼저 완성되었더라도 앞에 있는
+         * 모든 기능이 완성되지 않으면 배포가 불가능합니다.
+         *
+         * 따라서 5일째에 1개의 기능, 10일째에 3개의 기능, 20일째에 2개의 기능이 배포됩니다.
+         *
+         * ※ 공지 - 2020년 7월 14일 테스트케이스가 추가되었습니다.
          */
 
         int[][] maps = {{1, 0, 1, 1, 1}, {1, 0, 1, 0, 1}, {1, 0, 1, 1, 1}, {1, 1, 1, 0, 1}, {0, 0, 0, 0, 1}};
         Solution s = new Solution();
 
-        int[] array1 = {3, 1, 2, 3};
-//        List<Integer> list1 = Arrays.asList(array1);
+        int[] progresses = {95, 90, 99, 99, 80, 99};
 
-        int[] array2 = {3, 3, 3, 2, 2, 4};
-//        List<Integer> list2 = Arrays.asList(array2);
+        int[] speeds = {1, 1, 1, 1, 1, 1};
+        System.out.println(s.solution(progresses, speeds));
 
         int[] array3 = {3, 3, 3, 2, 2, 2};
-//        List<Integer> list3 = Arrays.asList(array3);
-
-//        System.out.println("List 1: " + list1);
-//        System.out.println("List 2: " + list2);
-//        System.out.println("List 3: " + list3);
-
-        System.out.println(s.solution(array1));
     }
 
 }

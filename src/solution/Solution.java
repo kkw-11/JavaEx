@@ -5,40 +5,43 @@ import java.util.*;
 class Solution {
 
     public int[] solution(int[] progresses, int[] speeds) {
-        List<Integer> answerList = new ArrayList<>();
-        List<Integer> deploymentLeadDay = new ArrayList<>();
+        int[] answer = new int[progresses.length];
+        int cnt = 0;
+
+        List<Integer> deploymentDay = new ArrayList<>();
 
         for (int i = 0; i < progresses.length; ++i) {
-            deploymentLeadDay.add((int) (Math.ceil((double) (100 - progresses[i]) / speeds[i])));
+            deploymentDay.add((int) (Math.ceil((double) (100 - progresses[i]) / speeds[i])));
         }
         Stack<Integer> deploymentLeadDayStack = new Stack<>();
-        Integer rightMax = 0;
+        Integer rightMaxNum = 0;
 
         for (int i = 0; i < progresses.length; ++i) {
             if (deploymentLeadDayStack.isEmpty()) {
-                deploymentLeadDayStack.push(deploymentLeadDay.get(i));
-                rightMax = deploymentLeadDay.get(i);
+                deploymentLeadDayStack.push(deploymentDay.get(i));
+                rightMaxNum = deploymentDay.get(i);
             } else {
-                if (deploymentLeadDay.get(i) <= rightMax) {
-                    deploymentLeadDayStack.push(deploymentLeadDay.get(i));
+                if (deploymentDay.get(i) <= rightMaxNum) {
+                    deploymentLeadDayStack.push(deploymentDay.get(i));
                 } else {
-                    answerList.add(deploymentLeadDayStack.size());
+                    answer[cnt++] = deploymentLeadDayStack.size();
                     deploymentLeadDayStack.removeAllElements();
-                    rightMax = deploymentLeadDay.get(i);
-                    deploymentLeadDayStack.push(deploymentLeadDay.get(i));
+                    rightMaxNum = deploymentDay.get(i);
+                    deploymentLeadDayStack.push(deploymentDay.get(i));
 
                 }
             }
 
         }
         if(!deploymentLeadDayStack.isEmpty()){
-            answerList.add(deploymentLeadDayStack.size());
+            answer[cnt++] = deploymentLeadDayStack.size();
         }
 
-        int[] answer = answerList.stream().mapToInt(Integer::intValue).toArray();
+//        answer = answerList.stream().mapToInt(Integer::intValue).toArray();
+        int[] result = new int[cnt];
+        System.arraycopy(answer, 0, result, 0, cnt);
 
-
-        return answer;
+        return result;
     }
 
 

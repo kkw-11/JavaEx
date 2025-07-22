@@ -20,7 +20,6 @@ public class ChatClient {
                 System.out.print("[클라이언트:] 서버로 보낼 메시지 입력: ");
                 String msg = keyboardInput.readLine();
 
-
                 networkOut.write(msg + "\n");
                 networkOut.flush();
                 System.out.println("서버로 메시지를 전송했습니다. ");

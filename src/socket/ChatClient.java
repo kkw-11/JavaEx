@@ -13,16 +13,16 @@ public class ChatClient {
         final int SERVER_PORT = 12345;
 
         try (Socket socket = new Socket(SERVER_IP, SERVER_PORT);
-             BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-             BufferedReader in = new BufferedReader(new InputStreamReader(System.in))) {
+             BufferedWriter networkOut = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+             BufferedReader keyboardInput = new BufferedReader(new InputStreamReader(System.in))) {
 
             while (true) {
                 System.out.print("[클라이언트:] 서버로 보낼 메시지 입력: ");
-                String msg = in.readLine();
+                String msg = keyboardInput.readLine();
 
 
-                out.write(msg + "\n");
-                out.flush();
+                networkOut.write(msg + "\n");
+                networkOut.flush();
                 System.out.println("서버로 메시지를 전송했습니다. ");
                 if (msg == null || msg.equals("bye")) {
                     System.out.println("채팅 프로그램을 종료 합니다. ");

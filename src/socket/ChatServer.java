@@ -16,8 +16,8 @@ public class ChatServer {
 
             while (true){
                 // 클라이언트로부터 메시지 읽기
-                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                String message = in.readLine();
+                BufferedReader networkInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                String message = networkInput.readLine();
                 System.out.println("클라이언트로부터 메시지: " + message);
                 if(message.equals("bye")) {
                     System.out.println("서버를 종료합니다.");

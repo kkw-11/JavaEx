@@ -8,53 +8,35 @@ public class ChatClient {
     public static void main(String[] args) {
         final String SERVER_IP = "127.0.0.1";
         final int SERVER_PORT = 12345;
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.print("[닉네임 입력] : ");
-        String nickname = scanner.nextLine();
 
         try (
                 Socket socket = new Socket(SERVER_IP, SERVER_PORT);
                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+                Scanner scanner = new Scanner(System.in)
         ) {
-            // 서버에 닉네임 먼저 전송
-            out.write(nickname + "\n");
-            out.flush();
+            System.out.println("서버와 연결 : " + SERVER_IP);
+            while (true) {
+                // 1. 클라이언트 → 서버로 메시지 전송
+                System.out.print("[클라이언트] 메시지 입력: ");
+                String clientMsg = scanner.nextLine();
+                out.write(clientMsg + "\n");
+                out.flush();
+                System.out.println("[클라이언트 메시지 전송이 완료되었습니다.\n");
 
-            // 입력(내 메시지 송신) 스레드
-            Thread sender = new Thread(() -> {
-                try {
-                    while (true) {
-                        System.out.print("[내 메시지 입력] : ");
-                        String msg = scanner.nextLine();
-                        out.write(msg + "\n");
-                        out.flush();
-                    }
-                } catch (IOException e) {
-                    System.out.println("서버와 연결이 끊어졌습니다.");
+                if (clientMsg.equalsIgnoreCase("bye")) {
+                    System.out.println("채팅 종료");
+                    break;
                 }
-            });
 
-            // 수신(서버 메시지) 스레드
-            Thread receiver = new Thread(() -> {
-                try {
-                    String msg;
-                    while ((msg = in.readLine()) != null) {
-                        System.out.println("\r" + msg);
-                        System.out.print("[내 메시지 입력] : "); // 입력 프롬프트를 재출력
-                    }
-                } catch (IOException e) {
-                    System.out.println("\r서버와 연결이 끊어졌습니다.");
+                // 2. 서버 메시지 수신
+                String serverMsg = in.readLine();
+                if (serverMsg == null || serverMsg.equalsIgnoreCase("bye")) {
+                    System.out.println("서버에서 채팅 종료");
+                    break;
                 }
-            });
-
-            sender.start();
-            receiver.start();
-
-            sender.join();
-            receiver.join();
-
+                System.out.println("[서버] " + serverMsg);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

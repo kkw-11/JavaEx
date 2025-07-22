@@ -2,75 +2,45 @@ package socket;
 
 import java.io.*;
 import java.net.*;
-import java.util.Set;
-import java.util.concurrent.*;
+import java.util.Scanner;
 
 public class ChatServer {
-    private static final int PORT = 12345;
-    private static final int THREAD_POOL_SIZE = 16; // 동시 최대 16명 처리 (원하는 수로 조절)
-    private static final Set<BufferedWriter> clientWriters = ConcurrentHashMap.newKeySet();
-
     public static void main(String[] args) {
+        final int PORT = 12345;
         System.out.println("서버 시작. 클라이언트 연결 대기 중...");
 
-        ExecutorService threadPool = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
-
-        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-            while (true) {
+        try (
+                ServerSocket serverSocket = new ServerSocket(PORT);
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("클라이언트 연결됨: " + clientSocket.getInetAddress());
-                threadPool.submit(new ClientHandler(clientSocket));
+                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+                Scanner scanner = new Scanner(System.in)
+        ) {
+            System.out.println("클라이언트1 연결됨: " + clientSocket.getInetAddress());
+
+            while (true) {
+                // 1. 클라이언트 메시지 읽기
+                String clientMsg = in.readLine();
+                if (clientMsg == null || clientMsg.equalsIgnoreCase("bye")) {
+                    System.out.println("클라이언트 연결 종료");
+                    break;
+                }
+                System.out.println("[클라이언트1] : " + clientMsg);
+
+                // 2. 서버 메시지 입력 및 전송
+                System.out.print("[서버] 메시지 입력: ");
+                String serverMsg = scanner.nextLine();
+                out.write(serverMsg + "\n");
+                out.flush();
+                System.out.println("[서버의 메시지 전송이 완료되었습니다.]\n");
+
+                if (serverMsg.equalsIgnoreCase("bye")) {
+                    System.out.println("서버 종료");
+                    break;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }
-        // threadPool.shutdown(); // 서버 종료시 사용
-    }
-
-    static class ClientHandler implements Runnable {
-        private Socket socket;
-        private BufferedReader in;
-        private BufferedWriter out;
-        private String nickname;
-
-        public ClientHandler(Socket socket) {
-            this.socket = socket;
-            try {
-                in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-                clientWriters.add(out);
-
-                // 닉네임 먼저 받음
-                this.nickname = in.readLine();
-                broadcast("[알림] " + nickname + " 님이 입장했습니다!");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void run() {
-            try {
-                String msg;
-                while ((msg = in.readLine()) != null) {
-                    broadcast("[" + nickname + "] " + msg);
-                }
-            } catch (IOException e) {
-                // 연결 끊김
-            } finally {
-                try { socket.close(); } catch (IOException ignored) {}
-                clientWriters.remove(out);
-                broadcast("[알림] " + nickname + " 님이 퇴장했습니다.");
-            }
-        }
-
-        private void broadcast(String msg) {
-            for (BufferedWriter writer : clientWriters) {
-                try {
-                    writer.write(msg + "\n");
-                    writer.flush();
-                } catch (IOException ignored) {}
-            }
         }
     }
 }

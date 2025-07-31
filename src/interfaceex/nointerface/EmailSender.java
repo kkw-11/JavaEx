@@ -1,4 +1,4 @@
-package interfaceex.interfaceuse;
+package interfaceex.nointerface;
 
 public class EmailSender {
     public void send(String to, String message){

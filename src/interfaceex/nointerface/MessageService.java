@@ -1,16 +1,14 @@
-package interfaceex.interfaceuse;
+package interfaceex.nointerface;
 
 public class MessageService {
-    private EmailSender emailSender = new EmailSender(); //강한 결합
+    private SmsSender smsSender = new SmsSender(); //바뀐 구현체
 
     public void notifyUser(String user, String message){
-        //EmailSender 내부 구현은 몰라도 되지만, 클래스가 직접의존
-        emailSender.send(user + "@email.com", message);
+        smsSender.sendSms(user, message); //서비스 코드 직접 변경
     }
 
     public static void main(String[] args){
         MessageService messageService = new MessageService();
         messageService.notifyUser("alice", "인터페이스 없이 직접 구현체 사용");
     }
-
 }
